@@ -1,14 +1,12 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
 class conductores(models.Model):
     id_conductor = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    documento = models.CharField(max_length=20)
     celular = models.CharField(max_length=20)
-    licencia = models.CharField(max_length=50)
-    fecha_vencimiento = models.DateField()
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
@@ -21,7 +19,7 @@ class conductores(models.Model):
 
 class vehiculos(models.Model):
     id_vehiculo = models.AutoField(primary_key=True)
-    placa = models.CharField(max_length=20)
+    placa = models.CharField(max_length=20, unique=True)
     marca = models.CharField(max_length=50)
     modelo = models.CharField(max_length=50)
     año = models.IntegerField()
@@ -37,7 +35,7 @@ class vehiculos(models.Model):
 
 class estaciones(models.Model):
     id_estacion = models.AutoField(primary_key=True)
-    nombre_estacion = models.CharField(max_length=100)
+    nombre_estacion = models.CharField(max_length=100, unique=True)
     ciudad = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
     activo = models.BooleanField(default=True)
@@ -52,17 +50,17 @@ class estaciones(models.Model):
 
 class rutas(models.Model):
     id_ruta = models.AutoField(primary_key=True)
-    nombre_ruta = models.CharField(max_length=100)
+    nombre_ruta = models.CharField(max_length=100, unique=True)
     id_origen = models.ForeignKey(
         estaciones,
         on_delete=models.CASCADE,
-        db_column='id_estacion',
+        db_column='id_origen',
         related_name='origen_estacion'
     )
     id_destino = models.ForeignKey(
         estaciones,
         on_delete=models.CASCADE,
-        db_column='id_estacion',
+        db_column='id_destino',
         related_name='destino_estacion'
         )
     distancia_km = models.FloatField()
@@ -72,9 +70,19 @@ class rutas(models.Model):
 
     def __str__(self):
         return self.nombre_ruta
+
+    def clean(self):
+        if self.id_origen_id and self.id_destino_id and self.id_origen_id == self.id_destino_id:
+            raise ValidationError('La estacion de origen no puede ser la misma que la estacion de destino.')
     
     class Meta:
         db_table = 'rutas'
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(id_origen=models.F('id_destino')),
+                name='origen_destino_diferentes'
+            )
+        ]
     
 class viajes(models.Model):
     id_viaje = models.AutoField(primary_key=True)
@@ -162,3 +170,46 @@ class mantenimientos(models.Model):
     
     class Meta:
         db_table = 'mantenimientos'
+
+
+class licencia(models.Model):
+    id_licencia = models.AutoField(primary_key=True)
+    id_conductor = models.ForeignKey(
+        conductores,
+        on_delete=models.CASCADE,
+        db_column='id_conductor'
+        )
+    numero_licencia = models.CharField(max_length=50, unique=True)
+    fecha_emision = models.DateField()
+    fecha_vencimiento = models.DateField()
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Licencia {self.numero_licencia} - Conductor: {self.id_conductor.nombre} - Vencimiento: {self.fecha_vencimiento.strftime("%Y-%m-%d")}'
+    
+    class Meta:
+        db_table = 'licencia'
+
+class documentos(models.Model):
+    id_documento = models.AutoField(primary_key=True)
+    id_conductor = models.ForeignKey(
+        conductores,
+        on_delete=models.CASCADE,
+        db_column='id_conductor'
+    )
+    tipo_documento = models.CharField(max_length=50)
+    numero_documento = models.CharField(max_length=50, unique=True)
+    fecha_nacimiento = models.DateField()
+    fecha_emision = models.DateField()
+    fecha_vencimiento = models.DateField()
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Documento {self.tipo_documento} - Conductor: {self.id_conductor.nombre} - Vencimiento: {self.fecha_vencimiento.strftime("%Y-%m-%d")}'
+    
+    class Meta:
+        db_table = 'documentos'

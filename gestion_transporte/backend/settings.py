@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from decouple import config
 
-DEBUG = config('DEBUG', default=True, cast=bool)
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -129,7 +127,7 @@ USE_I18N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'gestion_encuentro.pagination.DefaultPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'gestion_transporte.pagination.DefaultPageNumberPagination',
     'PAGE_SIZE': 10,
 }
 
