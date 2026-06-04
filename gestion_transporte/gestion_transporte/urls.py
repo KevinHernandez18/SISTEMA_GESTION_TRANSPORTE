@@ -1,8 +1,9 @@
 from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from.views import (
+from .views import (
     VehiculoViewSet,
     ConductorViewSet,
     EstacionViewSet,
@@ -12,7 +13,7 @@ from.views import (
     BoletoViewSet,
     MantenimientoViewSet,
     LicenciaViewSet,
-    DocumentoViewSet
+    DocumentoViewSet,
 )
 
 from rest_framework import permissions
@@ -44,7 +45,9 @@ router.register(r'documentos', DocumentoViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

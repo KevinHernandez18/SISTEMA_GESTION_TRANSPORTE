@@ -1,4 +1,6 @@
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 class DefaultPageNumberPagination(PageNumberPagination):
@@ -13,3 +15,17 @@ class DefaultPageNumberPagination(PageNumberPagination):
             return None
 
         return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'message': 'Lista de resultados',
+            'data': data,
+            'pagination': {
+                'current_page': self.page.number,
+                'page_size': self.get_page_size(self.request),
+                'total_pages': self.page.paginator.num_pages,
+                'total_items': self.page.paginator.count,
+            },
+        }, status=status.HTTP_200_OK)
