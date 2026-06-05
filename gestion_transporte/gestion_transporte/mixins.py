@@ -1,10 +1,12 @@
 import csv
 import logging
 import threading
+from io import BytesIO
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponse
 from django.utils import timezone
+from openpyxl import Workbook
 from rest_framework import status, filters, viewsets
 from rest_framework.settings import api_settings
 from rest_framework.decorators import action
@@ -241,13 +243,71 @@ class BaseModelViewSet(CustomResponseMixin, viewsets.ModelViewSet):
         if not data:
             return self.success_response(data=[], message='No hay datos para exportar')
 
+        # Crear workbook de Excel
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Datos'
+
+        # Agregar encabezados
         field_names = list(data[0].keys())
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="{self.basename or self.queryset.model.__name__}.csv"'
-        writer = csv.writer(response)
-        writer.writerow(field_names)
+        worksheet.append(field_names)
+
+        # Agregar datos - convertir valores complejos a strings
         for item in data:
-            writer.writerow([item.get(field_name, '') for field_name in field_names])
+            row_data = []
+            for field_name in field_names:
+                value = item.get(field_name, '')
+                # Convertir valores complejos a strings
+                if isinstance(value, dict):
+                    # Intentar extraer un campo legible del diccionario
+                    if 'nombre_estacion' in value:
+                        value = value.get('nombre_estacion', '')
+                    elif 'nombre_ruta' in value:
+                        value = value.get('nombre_ruta', '')
+                    elif 'nombre' in value:
+                        value = value.get('nombre', '')
+                    elif 'placa' in value:
+                        value = value.get('placa', '')
+                    else:
+                        # Si no encuentra un campo legible, usar el ID si existe
+                        for key in ['id_estacion', 'id_ruta', 'id_vehiculo', 'id_conductor', 'id_pasajero', 'id']:
+                            if key in value:
+                                value = value.get(key, '')
+                                break
+                        else:
+                            value = str(value)
+                elif isinstance(value, list):
+                    value = str(value)
+                elif value is None:
+                    value = ''
+                row_data.append(value)
+            worksheet.append(row_data)
+
+        # Ajustar ancho de columnas automáticamente
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        # Guardar en buffer
+        buffer = BytesIO()
+        workbook.save(buffer)
+        buffer.seek(0)
+
+        # Crear respuesta HTTP
+        filename = f'{self.basename or self.queryset.model.__name__}.xlsx'
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
         return response
 

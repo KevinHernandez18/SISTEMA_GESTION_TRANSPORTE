@@ -30,7 +30,7 @@ class VehiculoViewSet(BaseModelViewSet):
     serializer_class = VehiculoSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['placa', 'marca', 'modelo', 'año', 'activo', 'fecha_creacion']
+    filterset_fields = ['id_vehiculo', 'placa', 'marca', 'modelo', 'año']
     search_fields = ['placa', 'marca', 'modelo']
     ordering_fields = ['id_vehiculo', 'placa', 'marca', 'modelo', 'año', 'fecha_creacion']
 
@@ -40,7 +40,7 @@ class ConductorViewSet(BaseModelViewSet):
     serializer_class = ConductorSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['nombre', 'celular', 'activo', 'fecha_creacion']
+    filterset_fields = ['id_conductor', 'nombre', 'celular']
     search_fields = ['nombre', 'celular']
     ordering_fields = ['id_conductor', 'nombre', 'fecha_creacion']
 
@@ -50,7 +50,7 @@ class EstacionViewSet(BaseModelViewSet):
     serializer_class = EstacionSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['nombre_estacion', 'ciudad', 'activo', 'fecha_creacion']
+    filterset_fields = ['id_estacion', 'nombre_estacion', 'ciudad', 'direccion']
     search_fields = ['nombre_estacion', 'ciudad']
     ordering_fields = ['id_estacion', 'nombre_estacion', 'ciudad', 'fecha_creacion']
 
@@ -60,7 +60,7 @@ class RutaViewSet(BaseModelViewSet):
     serializer_class = RutaSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['nombre_ruta', 'id_origen', 'id_destino', 'activo', 'fecha_creacion']
+    filterset_fields = ['id_ruta', 'nombre_ruta', 'id_origen', 'id_destino', 'distancia_km']
     search_fields = ['nombre_ruta']
     ordering_fields = ['id_ruta', 'nombre_ruta', 'distancia_km', 'fecha_creacion']
 
@@ -70,7 +70,7 @@ class ViajeViewSet(BaseModelViewSet):
     serializer_class = ViajeSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['id_vehiculo', 'id_conductor', 'id_ruta', 'fecha_salida', 'fecha_llegada', 'activo']
+    filterset_fields = ['id_viaje', 'id_vehiculo', 'id_conductor', 'id_ruta', 'fecha_salida', 'fecha_llegada']
     search_fields = ['id_vehiculo__placa', 'id_conductor__nombre', 'id_ruta__nombre_ruta']
     ordering_fields = ['id_viaje', 'fecha_salida', 'fecha_llegada', 'fecha_creacion']
 
@@ -80,7 +80,7 @@ class PasajeroViewSet(BaseModelViewSet):
     serializer_class = PasajeroSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['nombre', 'documento', 'correo', 'activo', 'fecha_creacion']
+    filterset_fields = ['id_pasajero', 'nombre', 'documento', 'celular', 'correo']
     search_fields = ['nombre', 'documento', 'correo']
     ordering_fields = ['id_pasajero', 'nombre', 'fecha_creacion']
 
@@ -90,7 +90,7 @@ class BoletoViewSet(BaseModelViewSet):
     serializer_class = BoletoSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['id_viaje', 'id_pasajero', 'fecha_reserva', 'activo']
+    filterset_fields = ['id_boleto', 'id_viaje', 'id_pasajero', 'fecha_reserva']
     search_fields = ['id_viaje__id_viaje', 'id_pasajero__nombre']
     ordering_fields = ['id_boleto', 'fecha_reserva']
 
@@ -100,7 +100,7 @@ class MantenimientoViewSet(BaseModelViewSet):
     serializer_class = MantenimientoSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['id_vehiculo', 'fecha_mantenimiento', 'costo', 'activo']
+    filterset_fields = ['id_mantenimiento', 'id_vehiculo', 'descripcion', 'fecha_mantenimiento', 'costo']
     search_fields = ['id_vehiculo__placa', 'descripcion']
     ordering_fields = ['id_mantenimiento', 'fecha_mantenimiento', 'costo']
 
@@ -110,7 +110,7 @@ class LicenciaViewSet(BaseModelViewSet):
     serializer_class = LicenciaSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['id_conductor', 'numero_licencia', 'fecha_emision', 'fecha_vencimiento', 'activo']
+    filterset_fields = ['id_licencia', 'id_conductor', 'numero_licencia', 'fecha_emision', 'fecha_vencimiento']
     search_fields = ['numero_licencia', 'id_conductor__nombre']
     ordering_fields = ['id_licencia', 'fecha_emision', 'fecha_vencimiento']
 
@@ -120,7 +120,7 @@ class DocumentoViewSet(BaseModelViewSet):
     serializer_class = DocumentoSerializer
     permission_classes = [RolePermission]
     required_roles = ['Administrador', 'Supervisor']
-    filterset_fields = ['id_conductor', 'tipo_documento', 'numero_documento', 'fecha_vencimiento', 'activo']
+    filterset_fields = ['id_documento', 'id_conductor', 'tipo_documento', 'numero_documento', 'fecha_nacimiento', 'fecha_emision', 'fecha_vencimiento']
     search_fields = ['tipo_documento', 'numero_documento', 'id_conductor__nombre']
     ordering_fields = ['id_documento', 'fecha_vencimiento']
     

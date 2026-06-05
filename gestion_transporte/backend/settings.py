@@ -146,6 +146,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
     'DEFAULT_VERSION': 'v1',
+    'EXCEPTION_HANDLER': 'gestion_transporte.exception_handlers.custom_exception_handler',
 }
 
 SIMPLE_JWT = {
