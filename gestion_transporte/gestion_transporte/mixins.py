@@ -234,12 +234,67 @@ class BaseModelViewSet(CustomResponseMixin, viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        set_current_user(self.request.user)
         instance = serializer.save()
         logger.info('Usuario %s creó %s %s', self.request.user, instance.__class__.__name__, instance.pk)
 
     def perform_update(self, serializer):
+        set_current_user(self.request.user)
         instance = serializer.save()
         logger.info('Usuario %s actualizó %s %s', self.request.user, instance.__class__.__name__, instance.pk)
+
+    def destroy(self, request, *args, **kwargs):
+        set_current_user(request.user)
+        instance = self.get_object()
+        instance.soft_delete()
+        logger.info(
+            'Usuario %s eliminó %s %s',
+            request.user,
+            instance.__class__.__name__,
+            getattr(instance, 'pk', None),
+        )
+        payload = {
+            'id': getattr(instance, 'pk', None),
+            'deleted': True,
+            'deleted_at': instance.deleted_at,
+        }
+        return self.success_response(
+            data=payload,
+            message='Registro eliminado correctamente (soft delete)',
+            status_code=status.HTTP_200_OK,
+        )
+
+    def create_export_response(self, headers, rows):
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Datos'
+        worksheet.append(headers)
+        for row in rows:
+            worksheet.append(row)
+
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        buffer = BytesIO()
+        workbook.save(buffer)
+        buffer.seek(0)
+
+        filename = f'{self.basename or self.queryset.model.__name__}.xlsx'
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
     @action(detail=False, methods=['get'], url_path='export')
     def export(self, request):

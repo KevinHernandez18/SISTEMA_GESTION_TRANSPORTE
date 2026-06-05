@@ -130,6 +130,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Disable automatic trailing slash appending for REST API endpoints
+APPEND_SLASH = False
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

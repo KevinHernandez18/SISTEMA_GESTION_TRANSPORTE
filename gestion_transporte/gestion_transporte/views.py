@@ -10,6 +10,7 @@ from .models import (
     licencia,
     documentos,
 )
+from rest_framework.decorators import action
 from .mixins import BaseModelViewSet, RolePermission
 from .serializers import (
     VehiculoSerializer,
@@ -114,6 +115,13 @@ class LicenciaViewSet(BaseModelViewSet):
     search_fields = ['numero_licencia', 'id_conductor__nombre']
     ordering_fields = ['id_licencia', 'fecha_emision', 'fecha_vencimiento']
 
+    @action(detail=False, methods=['get'], url_path='export')
+    def export(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        values = list(queryset.values_list('numero_licencia', flat=True))
+        rows = [[numero] for numero in values]
+        return self.create_export_response(['numero_licencia'], rows)
+
 
 class DocumentoViewSet(BaseModelViewSet):
     queryset = documentos.objects.select_related('id_conductor').all()
@@ -123,4 +131,11 @@ class DocumentoViewSet(BaseModelViewSet):
     filterset_fields = ['id_documento', 'id_conductor', 'tipo_documento', 'numero_documento', 'fecha_nacimiento', 'fecha_emision', 'fecha_vencimiento']
     search_fields = ['tipo_documento', 'numero_documento', 'id_conductor__nombre']
     ordering_fields = ['id_documento', 'fecha_vencimiento']
+
+    @action(detail=False, methods=['get'], url_path='export')
+    def export(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        values = list(queryset.values_list('numero_documento', flat=True))
+        rows = [[numero] for numero in values]
+        return self.create_export_response(['numero_documento'], rows)
     

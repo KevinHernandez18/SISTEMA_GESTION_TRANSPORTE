@@ -84,7 +84,8 @@ class MantenimientoSerializer(serializers.ModelSerializer):
 
 
 class LicenciaSerializer(serializers.ModelSerializer):
-    conductor = ConductorSerializer(source='id_conductor', read_only=True)
+    # Allow writing the related conductor by primary key when creating/updating.
+    id_conductor = serializers.PrimaryKeyRelatedField(queryset=conductores.objects.all())
 
     class Meta:
         model = licencia
@@ -92,7 +93,8 @@ class LicenciaSerializer(serializers.ModelSerializer):
 
 
 class DocumentoSerializer(serializers.ModelSerializer):
-    conductor = ConductorSerializer(source='id_conductor', read_only=True)
+    # Allow writing the related conductor by primary key when creating/updating.
+    id_conductor = serializers.PrimaryKeyRelatedField(queryset=conductores.objects.all())
 
     class Meta:
         model = documentos
