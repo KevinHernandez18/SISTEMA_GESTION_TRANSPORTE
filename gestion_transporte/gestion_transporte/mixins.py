@@ -21,7 +21,10 @@ _thread_locals = threading.local()
 
 
 def set_current_user(user):
-    _thread_locals.user = user
+    if getattr(user, 'is_authenticated', False):
+        _thread_locals.user = user
+    else:
+        _thread_locals.user = None
 
 
 def get_current_user():
@@ -114,9 +117,10 @@ class AuditableModel(models.Model):
         user = get_current_user()
         created = self.pk is None
 
-        if created and self.creado_por is None:
+        if created and self.creado_por is None and user is not None:
             self.creado_por = user
-        self.modificado_por = user
+        if user is not None:
+            self.modificado_por = user
         super().save(*args, **kwargs)
 
         if audit:
@@ -134,7 +138,9 @@ class AuditableModel(models.Model):
     def soft_delete(self):
         self.activo = False
         self.deleted_at = timezone.now()
-        self.eliminado_por = get_current_user()
+        user = get_current_user()
+        if user is not None:
+            self.eliminado_por = user
         self.save(audit=False)
         AuditLog.objects.create(
             usuario=self.eliminado_por,
