@@ -187,6 +187,19 @@ LOGGING = {
     },
 }
 
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer <token>"',
+            'name': 'Authorization',
+            'in': 'header',
+        }
+    },
+    'DEFAULT_INFO': 'backend.urls.schema_view',
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
