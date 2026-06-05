@@ -10,7 +10,7 @@ from openpyxl import Workbook
 from rest_framework import status, filters, viewsets
 from rest_framework.settings import api_settings
 from rest_framework.decorators import action
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import DefaultPageNumberPagination
@@ -322,6 +322,10 @@ class RolePermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
+
+        # Usuarios autenticados pueden leer todos los recursos.
+        if request.method in SAFE_METHODS:
+            return True
 
         required_roles = getattr(view, 'required_roles', None)
         if not required_roles:
