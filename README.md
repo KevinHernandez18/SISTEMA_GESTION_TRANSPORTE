@@ -382,6 +382,6 @@ Esta API entrega una base solida para operar un sistema de transporte con criter
 
 En conjunto, el proyecto representa una solucion backend robusta para administrar recursos, operaciones y registros claves dentro de una organizacion de transporte.
 
-| ⚠️ Advertencia |
-|---------------|
-| Al momento de realizar migraciones, recuerda que los campos Activo, Fecha_Creación y Fecha_Modificación, estarán por defecto como NOT NULL. Si no quieres enviar los datos al momento de realizar una operación POST, puedes configurarlos de manera manual y desactivar el valor Not Null dentro de PGAdmin. |
+>⚠️ Advertencia
+>---------------
+>Al momento de realizar migraciones, recuerda que los campos Activo, Fecha_Creación y Fecha_Modificación, estarán por defecto como NOT >NULL. Si no quieres enviar los datos al momento de realizar una operación POST, puedes configurarlos de manera manual y desactivar el >valor Not Null dentro de PGAdmin.
