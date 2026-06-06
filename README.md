@@ -384,4 +384,4 @@ En conjunto, el proyecto representa una solucion backend robusta para administra
 
 >⚠️ Advertencia
 >---------------
->Al momento de realizar migraciones, recuerda que los campos Activo, Fecha_Creación y Fecha_Modificación, estarán por defecto como NOT >NULL. Si no quieres enviar los datos al momento de realizar una operación POST, puedes configurarlos de manera manual y desactivar el >valor Not Null dentro de PGAdmin.
+>Al momento de realizar migraciones, recuerda que los campos Activo, Fecha_Creación y Fecha_Modificación, estarán por defecto como NOT NULL. Si no quieres enviar los datos al momento de realizar una operación POST, puedes configurarlos de manera manual y desactivar el valor Not Null dentro de PGAdmin.
